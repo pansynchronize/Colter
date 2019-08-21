@@ -28,8 +28,11 @@ private slots:
 
     void on_actionBGR_triggered();
 
+    void on_actionOpen_triggered();
+
 private:
     Ui::MainWindow *ui;
+    QString file;
 };
 
 #endif // MAINWINDOW_H

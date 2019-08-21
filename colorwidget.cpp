@@ -3,7 +3,29 @@
 
 ColorWidget::ColorWidget(QWidget *parent): QWidget(parent)
 {
+    lower_edit = new QLineEdit;
+    upper_edit = new QLineEdit;
+    lower_edit->setReadOnly(true);
+    upper_edit->setReadOnly(true);
+    fl1 = new QFormLayout;
+    fl2 = new QFormLayout;
+    hlayout = new QHBoxLayout;
+    fl1->addRow(tr("Lower"), lower_edit);
+    fl2->addRow(tr("Upper"), upper_edit);
+    hlayout->addLayout(fl1);
+    hlayout->addLayout(fl2);
+}
 
+ColorWidget::~ColorWidget()
+{
+    qDebug() << "Base Destruction!" << endl;
+    delete lower_edit;
+    delete upper_edit;
+    /*
+    delete hlayout;
+    delete fl1;
+    delete fl2;
+    */
 }
 
 HSVWidget::HSVWidget(QWidget *parent): ColorWidget(parent)
@@ -35,6 +57,7 @@ HSVWidget::HSVWidget(QWidget *parent): ColorWidget(parent)
     vb->addLayout(fl);
     vb->setStretch(0, 1);
     vb->setStretch(1, 0);
+    vb->addLayout(hlayout);
     QList<QSlider*> lst{hue_low_slider, hue_high_slider, sat_low_slider, sat_high_slider, val_low_slider, val_high_slider};
     for(auto* slider : lst){
         slider->setTickInterval(1);
@@ -43,6 +66,18 @@ HSVWidget::HSVWidget(QWidget *parent): ColorWidget(parent)
             setPixelMap(val);
         });
     }
+}
+
+HSVWidget::~HSVWidget()
+{
+    delete fl;
+    delete vb;
+    delete hue_low_slider;
+    delete sat_low_slider;
+    delete val_low_slider;
+    delete hue_high_slider;
+    delete sat_high_slider;
+    delete val_high_slider;
 }
 
 void HSVWidget::setPixelMap(const cv::Mat &img)
@@ -56,6 +91,8 @@ void HSVWidget::setPixelMap(const cv::Mat &img)
     imgLabel.setPixmap(map);
     imgLabel.pm = map;
     imgLabel.psize = map.size();
+    lower_edit->setText(QString("cv::Scalar(")+QString::number(hue_low_slider->value())+", "+QString::number(sat_low_slider->value())+", "+QString::number(val_low_slider->value())+")");
+    upper_edit->setText(QString("cv::Scalar(")+QString::number(hue_high_slider->value())+", "+QString::number(sat_high_slider->value())+", "+QString::number(val_high_slider->value())+")");
 }
 
 void HSVWidget::setPixelMap(int val)
@@ -68,6 +105,8 @@ void HSVWidget::setPixelMap(int val)
     imgLabel.setPixmap(map);
     imgLabel.pm = map;
     imgLabel.resizing();
+    lower_edit->setText(QString("cv::Scalar(")+QString::number(hue_low_slider->value())+", "+QString::number(sat_low_slider->value())+", "+QString::number(val_low_slider->value())+")");
+    upper_edit->setText(QString("cv::Scalar(")+QString::number(hue_high_slider->value())+", "+QString::number(sat_high_slider->value())+", "+QString::number(val_high_slider->value())+")");
 }
 
 HLSWidget::HLSWidget(QWidget *parent): ColorWidget(parent)
@@ -99,6 +138,27 @@ HLSWidget::HLSWidget(QWidget *parent): ColorWidget(parent)
     vb->addLayout(fl);
     vb->setStretch(0, 1);
     vb->setStretch(1, 0);
+    vb->addLayout(hlayout);
+    QList<QSlider*> lst{hue_low_slider, hue_high_slider, sat_low_slider, sat_high_slider, lum_low_slider, lum_high_slider};
+    for(auto* slider : lst){
+        slider->setTickInterval(1);
+        connect(slider, &QSlider::valueChanged, this, [this, slider](int val){
+            slider->setValue(val);
+            setPixelMap(val);
+        });
+    }
+}
+
+HLSWidget::~HLSWidget()
+{
+    delete fl;
+    delete vb;
+    delete hue_low_slider;
+    delete sat_low_slider;
+    delete lum_low_slider;
+    delete hue_high_slider;
+    delete sat_high_slider;
+    delete lum_high_slider;
 }
 
 void HLSWidget::setPixelMap(const cv::Mat &img)
@@ -113,6 +173,8 @@ void HLSWidget::setPixelMap(const cv::Mat &img)
     QPixmap map = QPixmap::fromImage(QImage((unsigned char*) tmp.data, tmp.cols, tmp.rows, tmp.step, QImage::Format_Grayscale8));
     imgLabel.setPixmap(map);
     imgLabel.pm = map;
+    lower_edit->setText(QString("cv::Scalar(")+QString::number(hue_low_slider->value())+", "+QString::number(lum_low_slider->value())+", "+QString::number(sat_low_slider->value())+")");
+    upper_edit->setText(QString("cv::Scalar(")+QString::number(hue_high_slider->value())+", "+QString::number(lum_high_slider->value())+", "+QString::number(sat_high_slider->value())+")");
 }
 
 void HLSWidget::setPixelMap(int)
@@ -126,6 +188,8 @@ void HLSWidget::setPixelMap(int)
     imgLabel.setPixmap(map);
     imgLabel.pm = map;
     imgLabel.resizing();
+    lower_edit->setText(QString("cv::Scalar(")+QString::number(hue_low_slider->value())+", "+QString::number(lum_low_slider->value())+", "+QString::number(sat_low_slider->value())+")");
+    upper_edit->setText(QString("cv::Scalar(")+QString::number(hue_high_slider->value())+", "+QString::number(lum_high_slider->value())+", "+QString::number(sat_high_slider->value())+")");
 }
 
 BGRWidget::BGRWidget(QWidget *parent): ColorWidget(parent)
@@ -157,6 +221,27 @@ BGRWidget::BGRWidget(QWidget *parent): ColorWidget(parent)
     vb->addLayout(fl);
     vb->setStretch(0, 1);
     vb->setStretch(1, 0);
+    vb->addLayout(hlayout);
+    QList<QSlider*> lst{blue_low_slider, green_high_slider, red_low_slider, blue_high_slider, green_low_slider, red_high_slider};
+    for(auto* slider : lst){
+        slider->setTickInterval(1);
+        connect(slider, &QSlider::valueChanged, this, [this, slider](int val){
+            slider->setValue(val);
+            setPixelMap(val);
+        });
+    }
+}
+
+BGRWidget::~BGRWidget()
+{
+    delete fl;
+    delete vb;
+    delete blue_low_slider;
+    delete green_low_slider;
+    delete red_low_slider;
+    delete blue_high_slider;
+    delete green_high_slider;
+    delete red_high_slider;
 }
 
 void BGRWidget::setPixelMap(const cv::Mat &img)
@@ -170,6 +255,8 @@ void BGRWidget::setPixelMap(const cv::Mat &img)
     QPixmap map = QPixmap::fromImage(QImage((unsigned char*) tmp.data, tmp.cols, tmp.rows, tmp.step, QImage::Format_Grayscale8));
     imgLabel.setPixmap(map);
     imgLabel.pm = map;
+    lower_edit->setText(QString("cv::Scalar(")+QString::number(blue_low_slider->value())+", "+QString::number(green_low_slider->value())+", "+QString::number(red_low_slider->value())+")");
+    upper_edit->setText(QString("cv::Scalar(")+QString::number(blue_high_slider->value())+", "+QString::number(green_high_slider->value())+", "+QString::number(red_high_slider->value())+")");
 
 }
 
@@ -184,4 +271,6 @@ void BGRWidget::setPixelMap(int)
     imgLabel.setPixmap(map);
     imgLabel.pm = map;
     imgLabel.resizing();
+    lower_edit->setText(QString("cv::Scalar(")+QString::number(blue_low_slider->value())+", "+QString::number(green_low_slider->value())+", "+QString::number(red_low_slider->value())+")");
+    upper_edit->setText(QString("cv::Scalar(")+QString::number(blue_high_slider->value())+", "+QString::number(green_high_slider->value())+", "+QString::number(red_high_slider->value())+")");
 }
